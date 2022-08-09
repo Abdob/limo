@@ -31,6 +31,7 @@ RUN apt update && apt install --no-install-recommends -y \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*
 
+RUN pip install --upgrade pip
 RUN pip install pykitti \
     jupyter \
     jupytext --upgrade
