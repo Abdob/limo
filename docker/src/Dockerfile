@@ -32,7 +32,7 @@ RUN apt update && apt install --no-install-recommends -y \
     && rm -rf /tmp/*
 
 RUN pip install --upgrade pip
-RUN pip install pykitti \
+RUN pip install pykitti==0.3.0 \
     jupyter \
     jupytext --upgrade
 
@@ -76,8 +76,8 @@ RUN rm -rf /workspace/limo_ws/src/limo \
     && git clone https://github.com/johannes-graeter/rosinterface_handler.git
 
 # solve issue https://github.com/johannes-graeter/limo/issues/50
-RUN cp -rf /usr/include/eigen3/Eigen /usr/include/Eigen -R
-RUN ln -sf /usr/include/eigen3/Eigen /usr/include/Eigen
+#RUN cp -rf /usr/include/eigen3/Eigen /usr/include/Eigen -R
+#RUN ln -sf /usr/include/eigen3/Eigen /usr/include/Eigen
 
 WORKDIR /workspace/limo_ws/
 RUN /bin/bash -c 'source /opt/ros/melodic/setup.bash && catkin build'
