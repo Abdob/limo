@@ -103,6 +103,7 @@ git clone https://github.com/abdob/limo
 cd limo/docker
 docker-compose build limo
 ```
+If the build fails comment or comment out line 86 and 97 from src/Dockerfile
 
 # step 8 - run notebook
 ```
