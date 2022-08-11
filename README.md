@@ -1,187 +1,125 @@
-# Limo
-
--------------------------------------------------------------------------------------------------------
-CALL FOR HACKATHON:
-Against all my expectations my work still invokes the interest of many. Since it aged quite a bit now, I would love to organize a Hackathon were people who love to code such as me take part to refurbish this repo. Possible things to do are:
-1. Make a standalone api that works without ros
-2. Make a python api (already started)
-3. Bring repo to C++20 as much as possible (basis is ros indepedant app)
-4. constexpr everything (as much as possible)
-5. ROS2
-6. Remake of the lidar point depth extraction module
-
-But for this I need YOUR HELP! Your reward will be a lot of fun, working together on a project with experienced devs and of course a contribution record (that looks pretty neat in applications ;) ).
-If you are interested, please contact me per mail or write an issue. If there is more than 2 people plus me, I will organize a date :)
-
--------------------------------------------------------------------------------------------------------
-
-Lidar-Monocular Visual Odometry.
-This library is designed to be an open platform for visual odometry algortihm development.
-We focus explicitely on the simple integration of the following key methodologies:
-
-* Keyframe selection
-* Landmark selection
-* Prior estimation
-* Depth integration from different sensors.
-* Scale integration by groundplane constraint.
-
-The core library keyframe_bundle_adjustment is a backend that should faciliate to swap these modules and easily develop those algorithms.
-
-* It is supposed to be an add-on module to do temporal inference of the optimization graph in order to smooth the result
-* In order to do that online a windowed approach is used
-* Keyframes are instances in time which are used for the bundle adjustment, one keyframe may have several cameras (and therefore images) associated with it
-* The selection of Keyframes tries to reduce the amount of redundant information while extending the time span covered by the optimization window to reduce drift
-* Methodologies for Keyframe selection:
-  * Difference in time
-  * Difference in motion
-
-* We use this library for combining Lidar with monocular vision.
-* Limo2 on KITTI is LIDAR with monocular Visual Odometry, supported with groundplane constraint
-* Video: https://youtu.be/wRemjJBjp64
-* Now we switched from kinetic to melodic
-
-## Details
-This work was accepted on IROS 2018.
-See https://arxiv.org/pdf/1807.07524.pdf .
-
-If you refer to this work please cite:
-
-```bibtex
-@inproceedings{graeter2018limo,
-  title={LIMO: Lidar-Monocular Visual Odometry},
-  author={Graeter, Johannes and Wilczynski, Alexander and Lauer, Martin},
-  booktitle={2018 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
-  pages={7872--7879},
-  year={2018},
-  organization={IEEE}
-}
+## step 1 - Install docker, the daemon.json file in line 20 is attached here
+```
+curl https://get.docker.com | sh \
+  && sudo systemctl --now enable docker
+```
+```
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+      && curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+      && curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | \
+            sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+            sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 ```
 
+```
+sudo apt-get update
+sudo apt-get install -y nvidia-docker2
+sudo systemctl restart docker
+sudo cp daemon.json /etc/docker/daemon.json
+sudo usermod -aG docker $USER
+sudo reboot
+```
 
-Please note that Limo2 differs from the publication. 
-We enhanced the speed a little and added additional groundplane reconstruction for pure monocular visual odometry and a combination of scale from LIDAR and the groundplane (best performing on KITTI).
-For information on Limo2, please see my dissertation https://books.google.de/books?hl=en&lr=&id=cZW8DwAAQBAJ&oi .
+## step 2 - Test nvidia + docker
+```
+sudo docker run --rm --gpus all nvidia/cuda:11.0.3-base-ubuntu20.04 nvidia-smi
+```
 
-## Installation
+## step 3 - Download dataset 
+```
+mkdir ~/limo_data
+```
 
-### Docker
-To facilitate the development I created a standalone dockerfile.
-* Install docker https://phoenixnap.com/kb/how-to-install-docker-on-ubuntu-18-04
-* build docker:
-```shell
-# This is where you put the rosbags this will be available at /limo_data in the container
-mkdir $HOME/limo_data
+Download and place the six files in ~/limo_data and unzip each one, the link is:
+http://www.cvlibs.net/datasets/kitti/eval_odometry.php
+
+```
+mv ~/Downloads/<file_name>.zip ~/limo_data
+mv ~/Downloads/<file_name>.zip ~/limo_data
+..
+..
+```
+```
+cd limo_data
+
+unzip <filename>.zip 
+unzip <filename>.zip 
+..
+..
+```
+Once you are done unzipping, unzip data_odometry_calib.zip again to make sure the correct calibration files were not overwritten.
+
+Download 01.bag and 04.bag and place them in /limo_data
+
+## step 4 - Build the semantic container
+```
+git clone https://github.com/Abdob/semantic-segmentation.git
+cd semantic-segmentation
+./docker_build.sh
+```
+## step 5 - Download semantic model
+place the model in semantic-segmentation
+https://drive.google.com/file/d/1OrTcqH_I3PHFiMlTTZJgBy8l_pladwtg/view?usp=sharing
+
+## step 6 - Run the docker container
+```
+cd semantic-segmentation
+./docker_run.h
+```
+# step 7 - Build limo container
+```
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+git clone https://github.com/abdob/limo
 cd limo/docker
 docker-compose build limo
 ```
-* You can run the docker and go to the entrypoint with 
-```shell
-docker-compose run limo bash
+
+# step 8 - run notebook
 ```
-Go to step Run in this tutorial and use tmux for terminals.
-* You can invoke a jupyter notebook with a python interface for limo with
-```shell
+cd limo/docker
 docker-compose up limo
 ```
-and open the suggested link from the run output in a browser.
+You will open the http link in the web browser starting with http://127.0.0.1:<special string>
 
-### Semantic segmentation
 
-The monocular variant expects semantic segmentation of the images.
-You can produce this for example with my fork from NVIDIA's semantic segmentation:
-1. Clone my fork
-```bash
-git clone https://github.com/johannes-graeter/semantic-segmentation
+# step 9 run limo demo
+Open three terminals, on the first one run a container instance
 ```
-2. Download best_kitti.pth as described in the README.md from NVIDIA and put it in the semantic-segmentation folder
-3. I installed via their docker, for which you must be logged in on (and register if necessary)
-https://ngc.nvidia.com/
-
-4. Build the container with 
-```bash
-docker-compose build semantic-segmentation
+docker-compose run --name docker_limo_run limo bash
 ```
 
-5. Run the segmentation with
-```bash
-docker-copmose run semantic-segmentation
+On the second one run
 ```
-Note that without a GPU this will take some time.
-With the Nvidia Quadro P2000 on my laptop i took around 6 seconds per image.
+docker exec -ti docker_limo_run bash
+source /opt/ros/melodic/setup.bash && source /workspace/limo_ws/devel/setup.bash
+roscore &
 
-### Requirements
-
-In any case:
-
-* ceres: 
-  - follow the instructions on [http://ceres-solver.org/installation.html](http://ceres-solver.org/installation.html)
-  - you will need ```sudo make install``` to install the headers.
-  - tested with libsuitesparse-dev from standard repos.
-* png++: 
-```shell
- sudo apt-get install libpng++-dev
- ```
-* install ros: 
-  - follow the instructions on [https://wiki.ros.org/melodic/Installation](https://wiki.ros.org/melodic/Installation).
-  - you will need to install ros-perception (for pcl).
-  - don't forget to source your ~/.bashrc afterwards.
-* install catkin_tools: 
-```shell 
-sudo apt-get install python-catkin-tools
- ```
-* install opencv_apps: 
-```shell
-sudo apt-get install ros-melodic-opencv-apps
 ```
-* install git: 
-```shell
-sudo apt-get install git
+On the second one run
+```
+cd /workspace/limo_ws
+roslaunch demo_keyframe_bundle_adjustment_meta kitti_standalone.launch
 ```
 
-### Build
+on the third one
+```
+docker exec -ti docker_limo_run bash
+source /opt/ros/melodic/setup.bash && source /workspace/limo_ws/devel/setup.bash
+cd /limo_data
+rosbag play 04.bag -r 0.1 --pause --clock
 
-* initiate a catkin workspace:
-    ```shell 
-    cd ${your_catkin_workspace}
-    catkin init
-    ```
+```
+on the first one
+```
+source /opt/ros/melodic/setup.bash && source /workspace/limo_ws/devel/setup.bash
+cd /workspace/limo_ws
+rviz -d src/limo/demo_keyframe_bundle_adjustment_meta/res/default.rviz 
+```
 
-* clone limo into src of workspace:
-    ```shell 
-    mkdir ${your_catkin_workspace}/src
-    cd ${your_catkin_workspace}/src
-    git clone https://github.com/johannes-graeter/limo.git
-    ```
-
-* clone dependencies and build repos
-    ```shell 
-    cd ${your_catkin_workspace}/src/limo
-    bash install_repos.sh
-    ```
-
-* unittests:
-    ```shell 
-    cd ${your_catkin_workspace}/src/limo
-    catkin run_tests --profile limo_release
-    ```
-    
-### Run
-* get test data [Sequence 04](https://drive.google.com/open?id=16txq5V2RJyJH_VTsbeYOJzSWR5AKOtin) or [Sequence 01](https://drive.google.com/open?id=1u7RFNSvx3IY6l3-hIHBEL1X3wUGri8Tg).
-This is a bag file generated from Kitti sequence 04 with added semantic labels.
-   
-* in different terminals (for example with tmux)
-    1. `roscore`
-    2. `rosbag play 04.bag -r 0.1 --pause --clock`
-    3. ```shell
-       source ${your_catkin_workspace}/devel_limo_release/setup.sh
-       roslaunch demo_keyframe_bundle_adjustment_meta kitti_standalone.launch
-       ```
-    4. unpause rosbag (hit space in terminal)
-    5. `rviz -d ${your_catkin_workspace}/src/demo_keyframe_bundle_adjustment_meta/res/default.rviz`
-
-* watch limo trace the trajectory in rviz :)
-* Before submitting an issue, please have a look at the section [Known issues](#known-issues).
-
-## Known issues
-* Unittest of LandmarkSelector.voxel fails with libpcl version 1.7.2 or smaller (just 4 landmarks are selected). 
-Since this works with pcl 1.8.1 which is standard for ros melodic, this is ignored. This should lower the performance of the software only by a very small amount.
+To stop the container run this a separate terminal
+```
+docker stop docker_limo_run
+docker rm docker_limo_run
+```
