@@ -99,9 +99,6 @@ cd semantic-segmentation
 ```
 # step 7 - Build limo container
 ```
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-
 git clone https://github.com/abdob/limo
 cd limo/docker
 docker-compose build limo
