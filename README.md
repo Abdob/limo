@@ -1,4 +1,13 @@
 ## step 1 - Install docker, the daemon.json file in line 20 is attached here
+
+if docker was installed before using
+https://docs.docker.com/engine/install/ubuntu/
+uninstall it
+```
+sudo apt-get purge docker-ce docker-ce-cli containerd.io docker-compose-plugin
+```
+
+
 ```
 curl https://get.docker.com | sh \
   && sudo systemctl --now enable docker
@@ -18,6 +27,26 @@ sudo systemctl restart docker
 sudo cp daemon.json /etc/docker/daemon.json
 sudo usermod -aG docker $USER
 sudo reboot
+```
+
+Note: if you have docker-compose version 1.25.0
+```
+docker-compose --version
+docker-compose version 1.25.0, build unknown
+```
+Uninstall using 
+```
+sudo apt purge docker-compose
+```
+Install docker compose
+```
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+close and reopen terminal you will see
+```
+docker-compose --version
+docker-compose version 1.29.2, build 5becea4c
 ```
 
 ## step 2 - Test nvidia + docker
