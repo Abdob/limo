@@ -8,6 +8,8 @@ sudo apt-get purge docker-ce docker-ce-cli containerd.io docker-compose-plugin
 ```
 
 
+The following is installation based on https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
+
 ```
 curl https://get.docker.com | sh \
   && sudo systemctl --now enable docker
