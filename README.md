@@ -145,7 +145,10 @@ source /opt/ros/melodic/setup.bash && source /workspace/limo_ws/devel/setup.bash
 cd /workspace/limo_ws
 rviz -d src/limo/demo_keyframe_bundle_adjustment_meta/res/default.rviz 
 ```
-
+move the results to the host
+```
+cp /tmp/poses_dump.txt /limo_data
+```
 To stop the container run this a separate terminal
 ```
 docker stop docker_limo_run
