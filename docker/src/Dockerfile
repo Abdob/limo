@@ -1,4 +1,11 @@
-FROM ros:melodic-perception
+#FROM ros:melodic-perception
+FROM osrf/ros:melodic-desktop-full
+
+# nvidia-container-runtime
+ENV NVIDIA_VISIBLE_DEVICES \
+    ${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES \
+    ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
 # System settings
 # max watches on files (commented out because it's not necessary right now)
@@ -76,8 +83,8 @@ RUN rm -rf /workspace/limo_ws/src/limo \
     && git clone https://github.com/johannes-graeter/rosinterface_handler.git
 
 # solve issue https://github.com/johannes-graeter/limo/issues/50
-#RUN cp -rf /usr/include/eigen3/Eigen /usr/include/Eigen -R
-#RUN ln -sf /usr/include/eigen3/Eigen /usr/include/Eigen
+RUN cp -rf /usr/include/eigen3/Eigen /usr/include/Eigen -R
+RUN ln -sf /usr/include/eigen3/Eigen /usr/include/Eigen
 
 WORKDIR /workspace/limo_ws/
 RUN /bin/bash -c 'source /opt/ros/melodic/setup.bash && catkin build'
@@ -87,6 +94,8 @@ RUN jupytext feature_tracking_notebook.py --to notebook
 
 COPY entry.sh /entry.sh
 RUN chmod +x /entry.sh
+
+RUN apt-get install ros-melodic-rviz -y
 
 ENTRYPOINT ["/entry.sh"]
 # CMD ["bash"]

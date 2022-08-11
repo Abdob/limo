@@ -6,10 +6,16 @@ services:
     build:
       context: ./src
     image: ros:melodic-perception
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
     ports:
       - 8888:8888
     environment:
-      - DISPLAY=${DISPLAY}
+      - DISPLAY=:0
+      - NVIDIA_VISIBILE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
     volumes:
       - $HOME/limo_data:/limo_data 
       - /tmp/.X11-unix:/tmp/.X11-unix
