@@ -15,7 +15,6 @@ distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
 sudo apt-get update
 sudo apt-get install -y nvidia-docker2
 sudo systemctl restart docker
-sudo apt install docker-compose -y
 sudo cp daemon.json /etc/docker/daemon.json
 sudo usermod -aG docker $USER
 sudo reboot
@@ -69,6 +68,9 @@ cd semantic-segmentation
 ```
 # step 7 - Build limo container
 ```
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
 git clone https://github.com/abdob/limo
 cd limo/docker
 docker-compose build limo
@@ -87,18 +89,28 @@ Open three terminals, on the first one run a container instance
 ```
 docker-compose run --name docker_limo_run limo bash
 
-cd /workspace/limo_ws/
+source /opt/ros/melodic/setup.bash && source /workspace/limo_ws/devel/setup.bash
 roscore &
-```
-On the second and third one run
-```
- docker exec -ti docker_limo_run bash
- source /opt/ros/melodic/setup.bash && source /workspace/limo_ws/devel/setup.bash
 ```
 On the second one run
 ```
+docker exec -ti docker_limo_run bash
+source /opt/ros/melodic/setup.bash && source /workspace/limo_ws/devel/setup.bash
 cd /limo_data
 rosbag play 04.bag -r 0.1 --pause --clock
+```
+On first one run
+```
+cd /workspace/limo_ws
+roslaunch demo_keyframe_bundle_adjustment_meta kitti_standalone.launch
+```
+
+on the third one
+```
+docker exec -ti docker_limo_run bash
+source /opt/ros/melodic/setup.bash && source /workspace/limo_ws/devel/setup.bash
+cd /workspace/limo_ws
+rviz -d src/limo/demo_keyframe_bundle_adjustment_meta/res/default.rviz 
 ```
 To stop the container run this a separate terminal
 ```
