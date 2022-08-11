@@ -1,4 +1,4 @@
-## step 1 - Install docker, the daemon.json file in line 20 is attached here
+## step 1 - Install docker
 
 if docker was installed before using
 https://docs.docker.com/engine/install/ubuntu/
