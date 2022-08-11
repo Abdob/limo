@@ -22,7 +22,7 @@ sudo reboot
 
 ## step 2 - Test nvidia + docker
 ```
-sudo docker run --rm --gpus all nvidia/cuda:11.0.3-base-ubuntu20.04 nvidia-smi
+docker run --rm --gpus all nvidia/cuda:11.0.3-base-ubuntu20.04 nvidia-smi
 ```
 
 ## step 3 - Download dataset 
