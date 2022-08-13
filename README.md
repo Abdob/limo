@@ -147,10 +147,10 @@ on the third one
 docker exec -ti docker_limo_run bash
 source /opt/ros/melodic/setup.bash && source /workspace/limo_ws/devel/setup.bash
 cd /limo_data
-rosbag play 01.bag -r 0.2 --pause --clock
+rosbag play 01.bag -r 0.1 --pause --clock
 
 ```
-on the first one
+(optional) on the first one
 ```
 source /opt/ros/melodic/setup.bash && source /workspace/limo_ws/devel/setup.bash
 cd /workspace/limo_ws

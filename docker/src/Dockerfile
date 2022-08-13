@@ -45,24 +45,24 @@ RUN pip install pykitti==0.3.0 \
 
 # Install ceres solver
 # Why is rm necessary? remove it when solved.
-# WORKDIR /opt
-# RUN rm -rf /opt/ceres-solver \
-#     && git clone https://ceres-solver.googlesource.com/ceres-solver \
-#     && mkdir -p /opt/ceres-solver/build
+ WORKDIR /opt
+ RUN rm -rf /opt/ceres-solver \
+     && git clone https://ceres-solver.googlesource.com/ceres-solver \
+     && mkdir -p /opt/ceres-solver/build
 RUN apt update && apt install --no-install-recommends -y libceres-dev
 
-# WORKDIR /opt/ceres-solver/build
-# RUN cmake .. -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF \
-#     && make \
-#     && make install
+WORKDIR /opt/ceres-solver/build
+RUN git checkout 1.13.0
+RUN cmake .. -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release \
+    && make && make install
 
 # Make catkin workspace
 RUN rm -rf /workspace \
     && mkdir -p /workspace/limo_ws/src \
     && /bin/bash -c 'source /opt/ros/melodic/setup.bash && catkin_init_workspace /workspace/limo_ws/src'
 
-# WORKDIR /workspace/limo_ws
-# RUN catkin config --profile limo_release -x _limo_release --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS=-Wall -Wextra -Wno-unused-parameter -Werror=address -Werror=array-bounds=1 -Werror=bool-compare -Werror=comment -Werror=enum-compare -Werror=format -Werror=init-self -Werror=logical-not-parentheses -Werror=maybe-uninitialized -Werror=memset-transposed-args -Werror=nonnull -Werror=nonnull-compare -Werror=openmp-simd -Werror=parentheses -Werror=return-type -Werror=sequence-point -Werror=sizeof-pointer-memaccess -Werror=switch -Werror=tautological-compare -Werror=trigraphs -Werror=uninitialized -Werror=volatile-register-var
+WORKDIR /workspace/limo_ws
+RUN catkin config --profile limo_release -x _limo_release --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS=-Wall -Wextra -Wno-unused-parameter -Werror=address -Werror=array-bounds=1 -Werror=bool-compare -Werror=comment -Werror=enum-compare -Werror=format -Werror=init-self -Werror=logical-not-parentheses -Werror=maybe-uninitialized -Werror=memset-transposed-args -Werror=nonnull -Werror=nonnull-compare -Werror=openmp-simd -Werror=parentheses -Werror=return-type -Werror=sequence-point -Werror=sizeof-pointer-memaccess -Werror=switch -Werror=tautological-compare -Werror=trigraphs -Werror=uninitialized -Werror=volatile-register-var
 
 # Install limo
 WORKDIR /workspace/limo_ws/src
