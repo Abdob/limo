@@ -121,6 +121,7 @@ You will open the http link in the web browser starting with http://127.0.0.1:<s
 # step 9 run limo demo
 Open three terminals, on the first one run a container instance
 ```
+docker rm docker_limo_run
 xhost +
 docker-compose run --name docker_limo_run limo bash
 ```
@@ -146,7 +147,7 @@ on the third one
 docker exec -ti docker_limo_run bash
 source /opt/ros/melodic/setup.bash && source /workspace/limo_ws/devel/setup.bash
 cd /limo_data
-rosbag play 04.bag -r 0.1 --pause --clock
+rosbag play 01.bag -r 0.2 --pause --clock
 
 ```
 on the first one
@@ -155,7 +156,8 @@ source /opt/ros/melodic/setup.bash && source /workspace/limo_ws/devel/setup.bash
 cd /workspace/limo_ws
 rviz -d src/limo/demo_keyframe_bundle_adjustment_meta/res/default.rviz 
 ```
-move the results to the host
+press space on the terminal playing the rosbag
+when done move the results to the host
 ```
 cp /tmp/poses_dump.txt /limo_data
 ```
