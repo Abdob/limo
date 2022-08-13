@@ -18,4 +18,4 @@ axis([center_x - A_range/2, center_x + A_range/2, center_z - A_range/2, center_z
 grid on
 xlabel('x (m)')
 ylabel('z (m)')
-title('Pose X vs Z, sequence 1, rate 0.1')
+title('Pose X vs Z, sequence 1, rate 0.125')
