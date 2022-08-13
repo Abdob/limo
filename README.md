@@ -1,5 +1,10 @@
 ## step 1 - Install docker
 
+install prereqs
+```
+sudo apt install git curl
+```
+
 if docker was installed before using
 https://docs.docker.com/engine/install/ubuntu/
 uninstall it
@@ -116,6 +121,7 @@ You will open the http link in the web browser starting with http://127.0.0.1:<s
 # step 9 run limo demo
 Open three terminals, on the first one run a container instance
 ```
+xhost +
 docker-compose run --name docker_limo_run limo bash
 ```
 
@@ -124,13 +130,16 @@ On the second one run
 docker exec -ti docker_limo_run bash
 source /opt/ros/melodic/setup.bash && source /workspace/limo_ws/devel/setup.bash
 roscore &
-
 ```
+press enter a couple times to return to bash
+
+
 On the second one run
 ```
 cd /workspace/limo_ws
 roslaunch demo_keyframe_bundle_adjustment_meta kitti_standalone.launch
 ```
+
 
 on the third one
 ```
